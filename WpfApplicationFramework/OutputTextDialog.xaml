@@ -1,0 +1,71 @@
+﻿<Window x:Class="Aldentea.Wpf.Application.OutputTextDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:local="clr-namespace:Aldentea.Wpf.Application"
+        Title="ファイル出力" Loaded="Window_Loaded" WindowStyle="ToolWindow" mc:Ignorable="d"
+		ResizeMode="CanMinimize"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		d:DesignHeight="154" d:DesignWidth="497" SizeToContent="WidthAndHeight">
+	
+	<Window.CommandBindings>
+		<CommandBinding Command="{x:Static local:Commands.SelectFileCommand}"
+										Executed="SelectFile_Executed"
+										CanExecute="SelectFile_CanExecute" />
+		<CommandBinding Command="{x:Static local:Commands.OutputTextCommand}"
+										Executed="OutputText_Executed"
+										CanExecute="OutputText_CanExecute" />
+	</Window.CommandBindings>
+	<Grid Name="mainGrid">
+		<Grid.DataContext>
+			<local:OutputTextConfig />
+		</Grid.DataContext>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="40"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="40"/>
+		</Grid.RowDefinitions>
+		<Grid Grid.Row="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Button Grid.Column="0" Content="出力先" HorizontalAlignment="Left"
+					Margin="3" Padding="10,3" VerticalAlignment="Center"
+					Command="{x:Static local:Commands.SelectFileCommand}" />
+			<Label Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,3" VerticalAlignment="Center"
+					 Content="{Binding Path=Destination}"/>
+		</Grid>
+		<StackPanel Grid.Row="2" Orientation="Horizontal" FlowDirection="RightToLeft">
+			<StackPanel.Resources>
+				<Style TargetType="Button">
+					<Setter Property="Padding" Value="20,3" />
+					<Setter Property="Margin" Value="10,3" />
+					<Setter Property="VerticalAlignment" Value="Bottom" />
+				</Style>
+			</StackPanel.Resources>
+			<Button Content="出力" Name="buttonOK"
+					Command="{x:Static local:Commands.OutputTextCommand}" />
+			<Button Content="キャンセル" Name="buttonCancel" IsCancel="True" />
+		</StackPanel>
+		<Expander Header="詳細設定" Margin="0,0,0,0" Grid.Row="1">
+			<Grid Height="Auto">
+				<GroupBox Header="区切り文字" HorizontalAlignment="Left" Margin="2,0,0,0" Name="groupBoxSeparator"
+							VerticalAlignment="Top" MinWidth="100"
+							RadioButton.Checked="groupBoxSeparator_Checked">
+					<StackPanel Orientation="Vertical">
+						<StackPanel.Resources>
+							<Style TargetType="RadioButton">
+								<Setter Property="Margin" Value="3" />
+								<Setter Property="HorizontalAlignment" Value="Left" />
+							</Style>
+						</StackPanel.Resources>
+						<RadioButton Content="タブ" Name="radioButtonTab" />
+						<RadioButton Content="カンマ" Name="radioButtonComma" />
+						<RadioButton Content="空白" Name="radioButtonSpace" />
+					</StackPanel>
+				</GroupBox>
+			</Grid>
+		</Expander>
+	</Grid>
+</Window>

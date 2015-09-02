@@ -1,0 +1,72 @@
+﻿09/04/2013 ver1.0.2
+1. ファイル履歴メニューをあるMenuItemの子として追加できるように変更．
+  - fileHistoryShortcutParentとしてそのMenuItemを設定，fileHistoryShortcutSeparatorにはnullを設定．
+
+01/14/2014 version 1.0.3
+
+1. Document.IsReadOnlyプロパティの実装に対応．
+  - OpenDocumentコマンドで，read-only関連の設定をできるように変更．
+  - IsModified周辺の実装を変更．
+2. それに合わせて，ファイル履歴からもread-onlyでオープンできるように変更．(1.0.3.2～)
+  - コンストラクタで，openAsReadOnlyFromFileHistoryフィールドをtrueに設定して下さい．
+3. CaptionConverterを，readonlyに対応．
+  - IsReadOnlyがtrueだと，ファイル名の前に"[読み取り専用]"を出力します．(1.0.3.3～)
+
+06/02/2014 version 2.0.0
+
+1. 名前空間を大幅に変更．
+2. いくつかのクラスをDocumentからApplicationに移動．
+3. WindowWithDocumentAndFileHistoryをBasicWindowに改名．
+4. プロジェクト自体も，WpfApplicationFrameworkに改名．
+
+
+06/18/2014 version 2.0.1
+
+1. Applicationクラスを定義．
+  - Documentやuser.configなどをこちらでハンドルするように変更してみたい．
+
+06/18/2014 version 2.0.2
+
+1. OutputTextDialogを追加。
+
+06/22/2014 version 2.1.0
+
+1. ConfirmToSaveを追加。
+
+08/08/2014 version 2.1.1
+
+1. AldenteaWpfDocumentを2.1.0に．
+  - Savedイベントの仕様変更を反映．
+
+09/02/2014 version 2.1.2
+
+1. Aboutコマンドを追加．
+
+09/17/2014 version 2.1.3
+
+1. Configコマンドを追加．
+
+09/26/2014 version 2.2.0
+
+1. BasicWindowにFileHistoryDisplayCountプロパティ(abstract)を追加．
+  - 履歴ショートカットメニューの数の上限を設定できる．
+
+10/02/2014 version 2.2.0.1
+
+1. ～Documentを2.1.1に変更．
+
+10/02/2014 version 2.2.1
+
+1. XmlDocumentにUseAutoSaveOperationHistoryプロパティを追加．
+  - 手動で操作履歴を記録することを視野に入れる．
+    その場合は(各操作のたびに)これをfalseにする．(終わったらtrueに戻す)
+  - なんか危険なフレームワークになりそうだけど，大丈夫かなぁ...
+
+10/27/2014 version 2.2.2 (2.2.1だった！？)
+
+1. ～Documentを2.2.2に更新．
+2. UnderstadingDialogを追加．
+
+10/29/2014 version 2.2.2.1
+
+1. OutputTextDialogのレイアウトを更新。

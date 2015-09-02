@@ -1,0 +1,16 @@
+﻿
+06/13/2014 version 1.0.1
+
+1. MySettingsの実装を変更．
+  - Appクラスに設定を取得するプロパティを実装．
+  - ちょっと名前空間をイジればスニペット化できそう．
+
+06/18/2014 version 1.0.2
+
+1. Appクラスの親クラスをAldentea.Wpf.Application.Applicationクラスに変更．
+  - Documentもこちらで管理してしまいたい．
+
+08/08/2014 version 1.0.3
+
+1. AldenteaWpfDocumentを2.1.0に．
+  - Savedイベントの仕様変更を反映．
