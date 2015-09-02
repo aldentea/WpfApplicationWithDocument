@@ -151,13 +151,14 @@ namespace Aldentea.Wpf.Document
 		bool _isDirty = false;
 		#endregion
 
+		// 03/17/2015 by aldentea : なぜか_isDirtyをtrueにしていたのを，falseに修正．
 		// 08/22/2013 by aldentea : IsDirtyプロパティの変更通知を追加(これ必要かな？外部に通知するのはIsModifiedプロパティだけでいいような気もする)．
 		#region *[virtual]ダーティフラグをクリア(ClearDirty)
 		public virtual void ClearDirty()
 		{
 			if (this.IsDirty)
 			{
-				this._isDirty = true;
+				this._isDirty = false;
 				NotifyPropertyChanged("IsDirty");
 				NotifyPropertyChanged(IS_MODIFIED_PROPERTY);
 			}

@@ -77,3 +77,11 @@
 1. CollectiveConfirmerを実装．
   - [はい][いいえ][全てはい][キャンセル]のいずれかを問い合わせます．
 
+03/17/2015 version 2.3.0
+
+1. OperationCacheの仕組みを修正．
+  - IOperationCacheにCanCancelWithメソッドを導入．
+    →従来の仕組みでは，通常の操作とOperationCacheによる操作を区別する必要があった．
+	  しかし，新しい仕組みでは，OperationCacheによる操作でもOperationCacheを作成してスタックに入れるようにする．
+	  ただし，入れたOperationCacheがスタックの末尾と"相殺可能"であれば，その2つをスタックから削除する，という動作にしてみる．
+	→アンドゥとリドゥの区別はできるのか？

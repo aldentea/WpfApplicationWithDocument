@@ -53,39 +53,5 @@ namespace Aldentea.Wpf.ApplicationSample
 
 
 
-		#region ファイルショートカットメニュー関連
-
-		// 06/21/2011 by aldentea : プロパティ化．
-		#region *[override]FileHistoryプロパティ
-		/// <summary>
-		/// ファイル履歴を取得します．
-		/// </summary>
-		protected override System.Collections.Specialized.StringCollection FileHistory
-		{
-			get
-			{
-				return MySettings.FileHistory;
-			}
-			set
-			{
-				MySettings.FileHistory = value;
-			}
-		}
-		#endregion
-
-		#region *[override]FileHistoryCountプロパティ
-		protected override byte FileHistoryCount
-		{
-			get { return MySettings.FileHistoryCount; }
-		}
-		#endregion
-
-		//private void WindowWithDocumentAndFileHistory_Loaded(object sender, RoutedEventArgs e)
-		//{
-
-		//}
-
-		#endregion
-
 	}
 }

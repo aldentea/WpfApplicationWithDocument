@@ -21,20 +21,6 @@ namespace Aldentea.Wpf.Application
 	/// </summary>
 	public abstract class BasicWindow : WindowWithDocument
 	{
-		/// <summary>
-		/// ファイル履歴を表す文字列のコレクションです．
-		/// </summary>
-		protected abstract System.Collections.Specialized.StringCollection FileHistory { get; set; }
-
-		/// <summary>
-		/// ファイル履歴の保持数を取得します．
-		/// </summary>
-		protected abstract byte FileHistoryCount { get; }
-
-		/// <summary>
-		/// ファイル履歴の表示数を取得します．
-		/// </summary>
-		protected abstract byte FileHistoryDisplayCount { get; }
 
 
 		#region *FileHistoryShortcutSeparatorプロパティ
@@ -209,20 +195,20 @@ namespace Aldentea.Wpf.Application
 					break;
 				}
 
-				if (FileHistory == null)
+				if (Application.Current.FileHistory == null)
 				{
-					FileHistory = new System.Collections.Specialized.StringCollection();
+					Application.Current.FileHistory = new System.Collections.Specialized.StringCollection();
 				}
 				// ファイル履歴を挿入．
-				else if (FileHistory.Count > 0)
+				else if (Application.Current.FileHistory.Count > 0)
 				{
 					if (n > 0)
 					{
 						FileHistoryShortcutParent.Items.Insert(n, new Separator { Tag = END_SEPARATOR });	// 結局ショートカットメニューの直後に来る．
 					}
-					for (int i = 0; i < FileHistory.Count && i < FileHistoryDisplayCount; i++)
+					for (int i = 0; i < Application.Current.FileHistory.Count && i < Application.Current.FileHistoryDisplayCount; i++)
 					{
-						var menuItem = GenerateFileHistoryShortcutMenuItem(FileHistory[i]);
+						var menuItem = GenerateFileHistoryShortcutMenuItem(Application.Current.FileHistory[i]);
 						FileHistoryShortcutParent.Items.Insert(n++, menuItem);
 					}
 				}
@@ -237,23 +223,7 @@ namespace Aldentea.Wpf.Application
 		/// <param name="fileName"></param>
 		protected void AddToFileHistory(string fileName)
 		{
-			// ※そもそもこんな↓心配する必要アルの？
-			// nullになりうるのは開発時だけじゃない？
-			// ※考えられるのは，NullReferenceException飛ばして再試行とか．
-			if (FileHistory == null)
-			{
-				// これどうする？
-				FileHistory = new System.Collections.Specialized.StringCollection();
-			}
-
-			FileHistory.Remove(fileName);
-			FileHistory.Insert(0, fileName);
-
-			byte max = FileHistoryCount;
-			while (FileHistory.Count > max)
-			{
-				FileHistory.RemoveAt(max);
-			}
+			Application.Current.AddToFileHistory(fileName);
 			// メニューを再構築．
 			BuildHistoryShortcut();
 		}
@@ -271,7 +241,7 @@ namespace Aldentea.Wpf.Application
 			var msg = string.Format("{0}を履歴から削除しますか？", fileName);
 			if (MessageBox.Show(msg, "履歴削除の確認", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No) == MessageBoxResult.Yes)
 			{
-				FileHistory.Remove(fileName);
+				Application.Current.FileHistory.Remove(fileName);
 				BuildHistoryShortcut();
 			}
 

@@ -4,6 +4,7 @@
         Height="350" Width="525"
         xmlns:local="clr-namespace:Aldentea.Wpf.Application;assembly=AldenteaWpfApplication"
 				xmlns:util="clr-namespace:Aldentea.Wpf.Utility;assembly=AldenteaWpfUtility"
+				xmlns:doc="clr-namespace:Aldentea.Wpf.Document;assembly=AldenteaWpfDocument"
         Closed="WindowWithDocument_Closed"
         xmlns:localdata="clr-namespace:Aldentea.Wpf.Document;assembly=AldenteaWpfDocument"
         OpenFileDialogFilter="mtuファイル(*.mtu)|*.mtu|すべてのファイル(*.*)|*.*"
@@ -25,7 +26,11 @@
 		<Menu Height="23" HorizontalAlignment="Stretch" Margin="0,0,0,0" Name="mainMenu" VerticalAlignment="Top">
 			<MenuItem Header="ファイル(_F)">
 				<MenuItem Header="新規作成(_N)" Command="New" />
-				<MenuItem Header="開く(_O)" Command="Open" />
+				<MenuItem Header="開く(_O)" Command="Open">
+					<MenuItem.CommandParameter>
+						<doc:OpenDocumentParameter EnableReadOnly="True" IsReadOnly="True" />
+					</MenuItem.CommandParameter>
+				</MenuItem>
 				<MenuItem Header="保存(_S)" Command="Save" />
 				<MenuItem Header="名前をつけて保存(_A)" Command="SaveAs" />
 				<Separator x:Name="fileHistorySeparator" />
