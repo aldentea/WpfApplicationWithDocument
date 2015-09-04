@@ -16,6 +16,7 @@
 		<MultiBinding Converter="{StaticResource captionConverter}">
 			<Binding Path="FileName" />
 			<Binding Path="IsModified" />
+			<Binding Path="IsReadOnly" />
 		</MultiBinding>
 	</Window.Title>
 	<!--    <Window.CommandBindings>

@@ -295,6 +295,7 @@ namespace Aldentea.Wpf.Document
 		// 07/13/2014 by aldentea
 		protected abstract void Initialize();
 
+		// (2.3.1)読み取り専用ファイルを開くときには自動的にIsReadOnlyプロパティをtrueにする．
 		// 10/22/2014 by aldentea : LoadDocumentの返値のチェックを追加．
 		// 01/14/2014 by aldentea : isReadOnly引数を追加．
 		// 02/14/2012 by aldentea : NowLoadingプロパティのsetを追加．
@@ -307,6 +308,8 @@ namespace Aldentea.Wpf.Document
 		public void Open(string fileName, bool isReadOnly = false)
 		{
 			//Initialize();	// ←これいる？
+			System.IO.FileInfo info = new System.IO.FileInfo(fileName);
+			isReadOnly = isReadOnly || info.IsReadOnly;
 
 			this.NowLoading = true;
 			try
