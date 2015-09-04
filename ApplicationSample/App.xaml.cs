@@ -43,7 +43,7 @@ namespace Aldentea.Wpf.ApplicationSample
 		#endregion
 
 		// 06/13/2014 by aldentea : これはその都度実装する必要がありますかねぇ．
-		public static App Current
+		public new static App Current
 		{
 			get
 			{

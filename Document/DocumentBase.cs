@@ -10,6 +10,7 @@ namespace Aldentea.Wpf.Document
 	// Document.DocumentクラスをAldentea.Wpf.Document.DocumentBaseクラスに変更．
 
 
+	// (2.4.0)IsModifiedはConvertedと無関係になりました．
 	// Ver.1.1 (08/22/2013 by aldentea)
 	// 従来のIsModifiedプロパティの実装はIsDirtyプロパティに変更になりました．
 	// 読み込み時に変換がされたことを示すConvertedプロパティが新設され，
@@ -121,6 +122,7 @@ namespace Aldentea.Wpf.Document
 		string _fileName = string.Empty;
 		#endregion
 
+		// (2.4.0)Convertedがtrue(かつIsReadOnlyがfalse)の場合にこれが常にtrueになる仕様を廃止しました．
 		// 01/14/2014 by aldentea : IsReadOnlyプロパティがtrueの場合には，このフラグが立たないように変更．
 		// 08/22/2013 by aldentea : 従来の定義から大幅に変更．非virtual化(overrideすべき部分はIsDirtyプロパティに切り出し)．
 		#region *IsModifiedプロパティ
@@ -131,7 +133,7 @@ namespace Aldentea.Wpf.Document
 		{
 			get
 			{
-				return IsReadOnly ? false : Converted || IsDirty;
+				return IsReadOnly ? false : IsDirty;
 			}
 		}
 		#endregion
@@ -178,11 +180,12 @@ namespace Aldentea.Wpf.Document
 		}
 		#endregion
 
+		// (2.4.0)IsModifiedプロパティとは無関係になりました．
 		// 08/22/2013 by aldentea
 		#region *Convertedプロパティ
 		/// <summary>
 		/// 読み込みにあたってドキュメントを変換したとき(＝もとのままで保存できないとき)に
-		/// trueになります．
+		/// trueになります．このプロパティがtrueだと，SaveメソッドはSaveAsメソッドにリダイレクトされます．
 		/// </summary>
 		protected bool Converted
 		{
@@ -196,7 +199,7 @@ namespace Aldentea.Wpf.Document
 				{
 					_converted = value;
 					NotifyPropertyChanged("Converted");
-					NotifyPropertyChanged("IsModified");
+					//NotifyPropertyChanged("IsModified");
 				}
 			}
 		}
@@ -295,6 +298,9 @@ namespace Aldentea.Wpf.Document
 		// 07/13/2014 by aldentea
 		protected abstract void Initialize();
 
+		// (2.3.2)LoadDocumentメソッド内で，IsReadOnlyプロパティをtrueにできるように改良
+		// (Convertedプロパティと一緒にtrueにするケースを想定)．
+		// (2.3.1)読み取り専用ファイルを開くときには自動的にIsReadOnlyプロパティをtrueにする．
 		// 10/22/2014 by aldentea : LoadDocumentの返値のチェックを追加．
 		// 01/14/2014 by aldentea : isReadOnly引数を追加．
 		// 02/14/2012 by aldentea : NowLoadingプロパティのsetを追加．
@@ -307,6 +313,8 @@ namespace Aldentea.Wpf.Document
 		public void Open(string fileName, bool isReadOnly = false)
 		{
 			//Initialize();	// ←これいる？
+			System.IO.FileInfo info = new System.IO.FileInfo(fileName);
+			isReadOnly = isReadOnly || info.IsReadOnly;
 
 			this.NowLoading = true;
 			try
@@ -321,7 +329,7 @@ namespace Aldentea.Wpf.Document
 				this.NowLoading = false;
 			}
 			this.FileName = fileName;
-			this.IsReadOnly = isReadOnly;
+			this.IsReadOnly = this.IsReadOnly || isReadOnly;
 			ClearDirty();	// ※ここではConvertedをクリアしない！
 			Opened(this, EventArgs.Empty);
 		}

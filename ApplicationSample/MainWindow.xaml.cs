@@ -15,6 +15,9 @@ using Aldentea.Wpf.Application;
 
 namespace Aldentea.Wpf.ApplicationSample
 {
+
+	// (1.0.6)タイトルバーを読み取り専用に対応．
+
 	/// <summary>
 	/// MainWindow.xaml の相互作用ロジック
 	/// </summary>
