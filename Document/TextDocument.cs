@@ -51,7 +51,7 @@ namespace Aldentea.Wpf.Document
 
 		// 07/13/2014 by aldentea : virtual→abstractとなったのに対応。
 		#region *初期化(Initialize)
-		protected override void Initialize()
+		protected override void InitializeDocument()
 		{
 			this.Body = string.Empty;
 		}
