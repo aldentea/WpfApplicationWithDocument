@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Aldentea.Wpf.Document
 {
+	// (3.0.0)新実装．
 	// (2.4.0)obsolete．
-	[Obsolete("Aldentea.Wpf.Document.Legacy名前空間の同名クラスを使用して下さい．")]
 	public abstract class DocumentWithOperationHistory : DocumentBase
 	{
 
@@ -78,12 +78,13 @@ namespace Aldentea.Wpf.Document
 
 		#region 操作履歴／ダーティフラグ関連
 
-		protected const string OPERATION_COUNT_PROPERTY = "OperationCount";
+		//protected const string OPERATION_COUNT_PROPERTY = "OperationCount";
 		//protected const string IS_MODIFIED_PROPERTY = "IsModified";
 
 		Stack<IOperationCache> operationHistory = new Stack<IOperationCache>();
 		Stack<IOperationCache> undoHistory = new Stack<IOperationCache>();
 
+		// (3.0.0)とりあえずprotectedにしてみます．それにともなって，プロパティ変更通知も止めてみます．
 		// 08/16/2013 by aldentea : IsModifiedプロパティの変更通知を追加．
 		#region *OperationCountプロパティ
 		/// <summary>
@@ -91,7 +92,7 @@ namespace Aldentea.Wpf.Document
 		/// この値が0の場合にのみ，IsModifiedプロパティはfalseを返します．
 		/// ※これ，publicじゃないほうがいいのでは？
 		/// </summary>
-		public int OperationCount
+		protected int OperationCount
 		{
 			get
 			{
@@ -102,7 +103,7 @@ namespace Aldentea.Wpf.Document
 				if (operationCount != value)
 				{
 					operationCount = value;
-					NotifyPropertyChanged(OPERATION_COUNT_PROPERTY);	// ※←これいるのか？
+					//NotifyPropertyChanged(OPERATION_COUNT_PROPERTY);	// ※←これいるのか？
 					NotifyPropertyChanged(IS_MODIFIED_PROPERTY);
 				}
 			}
@@ -161,6 +162,9 @@ namespace Aldentea.Wpf.Document
 		}
 		#endregion
 
+
+		// ★新たな実装では，アンドゥやリドゥの場合と統合しました．
+
 		// 10/23/2014 by aldentea
 		// リドゥ時も(アンドゥ時と同じように)スキップするように変更．
 		// リドゥ時は，これらの処理をRedoメソッドで行います．
@@ -169,50 +173,57 @@ namespace Aldentea.Wpf.Document
 		// 後者の場合にもAddOperationHistoryを呼び出すことを強制するよりは，リドゥの場合にAddOperationHistoryの処理を抑止して
 		// Redoメソッドでまとめて行う方が見通しがいいと考えた．)
 		#region *操作履歴を追加(AddOperationHistory)
-		/// <summary>
-		/// 操作履歴を追加します．
-		/// </summary>
-		/// <param name="item"></param>
-		public void AddOperationHistory(IOperationCache item)
+		protected void AddOperationHistory(IOperationCache item)
 		{
-			if (!_undoing && !_redoing)
+			if (operationHistory.Count > 0 && operationHistory.Peek().CanCancelWith(item))
 			{
+				// アンドゥ(相当の)操作を行った場合．
+
+				// itemをpushする代わりに，operationHistoryの先頭(末尾？)の要素とキャンセルする．
+				operationHistory.Pop();
+				undoHistory.Push(item);
+
+				OperationCount--;
+			}
+			else if (undoHistory.Count > 0 && undoHistory.Peek().CanCancelWith(item))
+			{
+				// リドゥ(相当の)操作を行った場合．
+
+				undoHistory.Pop();
 				operationHistory.Push(item);
+
+				OperationCount++;
+			}
+			else
+			{
+				// それ以外の操作を行った場合．
+
+				operationHistory.Push(item);
+				// もはやリドゥはできないので，スタックを空にする．
+				undoHistory.Clear();
+
 				if (OperationCount >= 0)
 				{
 					OperationCount++;
 				}
-				undoHistory.Clear();
 			}
 		}
 		#endregion
 
-		/// <summary>
-		/// アンドゥ中に立てるフラグ．
-		/// アンドゥ動作をoperationCacheに入れないようにするため．
-		/// </summary>
-		bool _undoing = false;
-
+		// ★新たな実装では，ここではPopせずPeekを使っています．
+		// Popの処理は，AddOperationHistoryメソッドで行います．
 		#region *元に戻す(Undo)
 		public void Undo()
 		{
 			if (this.CanUndo)
 			{
-				IOperationCache item = this.operationHistory.Pop();
-				try
-				{
-					this._undoing = true;
-					item.Reverse();
-					OperationCount--;
-					undoHistory.Push(item);
-				}
-				finally
-				{
-					this._undoing = false;
-				}
+				this.operationHistory.Peek().Reverse();
 			}
 		}
 		#endregion
+
+		// ★新たな実装では，ここではPopせずPeekを使っています．
+		// Popの処理は，AddOperationHistoryメソッドで行います．
 
 		// 10/23/2014 by aldentea : _redoingフラグをfalseにしてからOperationHistory周辺の処理をするように変更．
 		// 10/20/2014 by aldentea : item.Doの後の2行を追加．(AutoSave～を切る前提なので，これを使わない場合とは相性が悪いかも．)
@@ -225,45 +236,31 @@ namespace Aldentea.Wpf.Document
 		{
 			if (this.CanRedo)
 			{
-				var item = this.undoHistory.Pop();
-				this._redoing = true;
-				try
-				{
-					item.Do();
-					// 普通に実行すれば，OperationCountやundoHistoryは適切に処理されるはず．
-					// ↑いや，違うでしょ．undoHistoryがクリアされてしまうので，独自の処理が必要だね．
-				}
-				finally
-				{
-					this._redoing = false;
-				}
-				OperationCount++;
-				operationHistory.Push(item);
+				this.undoHistory.Peek().Reverse();
 			}
 		}
-
-		bool _redoing = false;
 		#endregion
 
 		#endregion
 
 	}
 
-
+	// (3.0.0)新実装．
 	// (2.4.0)obsolete
 	#region IOperationCacheインターフェイス
-	[Obsolete("Aldentea.Wpf.Document.Legacy名前空間の同名インターフェイスを使用して下さい．")]
 	public interface IOperationCache
 	{
-		/// <summary>
-		/// 正方向実行．
-		/// </summary>
-		void Do();
-
 		/// <summary>
 		/// 逆方向実行．
 		/// </summary>
 		void Reverse();
+
+		/// <summary>
+		/// 自身とotherが相殺可能かどうかを表す値を返します．
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns></returns>
+		bool CanCancelWith(IOperationCache other);
 	}
 	#endregion
 
