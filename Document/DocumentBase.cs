@@ -180,30 +180,31 @@ namespace Aldentea.Wpf.Document
 		}
 		#endregion
 
+		// (3.0.0)ConvertからIsConvertedに改名．
 		// (2.4.0)IsModifiedプロパティとは無関係になりました．
 		// 08/22/2013 by aldentea
-		#region *Convertedプロパティ
+		#region *IsConvertedプロパティ
 		/// <summary>
 		/// 読み込みにあたってドキュメントを変換したとき(＝もとのままで保存できないとき)に
 		/// trueになります．このプロパティがtrueだと，SaveメソッドはSaveAsメソッドにリダイレクトされます．
 		/// </summary>
-		protected bool Converted
+		protected bool IsConverted
 		{
 			get
 			{
-				return _converted;
+				return _isConverted;
 			}
 			set
 			{
-				if (Converted != value)
+				if (IsConverted != value)
 				{
-					_converted = value;
+					_isConverted = value;
 					NotifyPropertyChanged("Converted");
 					//NotifyPropertyChanged("IsModified");
 				}
 			}
 		}
-		bool _converted = false;
+		bool _isConverted = false;
 		#endregion
 
 		// 01/14/2014 by aldentea : setterはとりあえずprotectedにしておく．
@@ -237,6 +238,9 @@ namespace Aldentea.Wpf.Document
 		protected abstract bool LoadDocument(string fileName);
 		protected abstract bool SaveDocument(string fileName);
 
+		// 07/13/2014 by aldentea
+		protected abstract void InitializeDocument();
+
 		// 08/08/2014 by aldentea
 		// Savedの型を，EventHandlerからEventHandler<SavedEventHandler>に変更．
 		#region イベント
@@ -265,26 +269,27 @@ namespace Aldentea.Wpf.Document
 
 		#endregion
 
+		// (3.0.0)InitializeDocumentからInitializeに改名(メソッド名の入れ替え)．
 		// 07/13/2014 by aldentea
 		// NowLoadingフラグをたてる。メソッド名をInitializeDocumentに変更。個別の処理をInitializeメソッドに切り出し。
 		// 01/14/2014 by aldentea : IsReadOnlyプロパティの初期化を追加．
 		// 01/07/2014 by aldentea : Initializedイベントを発生させるように変更．
 		// 08/22/2013 by aldentea : Convertedプロパティの初期化を追加．
-		#region *初期化(InitializeDocument)
+		#region *初期化(Initialize)
 		/// <summary>
 		/// ドキュメントを初期化します．
 		/// オーバーライドする時は，派生クラス独自処理の後にbase.Initialize()を呼び出しましょう．
 		/// </summary>
-		private void InitializeDocument()
+		private void Initialize()
 		{
 			NowLoading = true;
 			try
 			{
-				Initialize();
+				InitializeDocument();
 
 				this.FileName = string.Empty;
 				ClearDirty();
-				Converted = false;
+				IsConverted = false;
 				IsReadOnly = false;
 				this.Initialized(this, EventArgs.Empty);
 			}
@@ -294,9 +299,6 @@ namespace Aldentea.Wpf.Document
 			}
 		}
 		#endregion
-
-		// 07/13/2014 by aldentea
-		protected abstract void Initialize();
 
 		// (2.3.2)LoadDocumentメソッド内で，IsReadOnlyプロパティをtrueにできるように改良
 		// (Convertedプロパティと一緒にtrueにするケースを想定)．
@@ -342,7 +344,7 @@ namespace Aldentea.Wpf.Document
 		/// </summary>
 		public void Close()
 		{
-			InitializeDocument();
+			Initialize();
 		}
 		#endregion
 
@@ -380,7 +382,7 @@ namespace Aldentea.Wpf.Document
 			// readonlyだと常にfalseを返す．
 			if (this.IsModified)
 			{
-				if (this.Converted || (string.IsNullOrEmpty(this.FileName))) {
+				if (this.IsConverted || (string.IsNullOrEmpty(this.FileName))) {
 			//if (this.IsDirty || this.Converted)
 			//{
 			//  if (this.FileName == string.Empty)
@@ -392,7 +394,7 @@ namespace Aldentea.Wpf.Document
 					if (SaveDocument(this.FileName))
 					{
 						ClearDirty();
-						Converted = false;
+						IsConverted = false;
 						Saved(this, new SavedEventArgs(FileName));
 						return SaveResult.Succeed;
 					}
@@ -436,7 +438,7 @@ namespace Aldentea.Wpf.Document
 			}
 
 			ClearDirty();
-			Converted = false;
+			IsConverted = false;
 			if (ClearReadOnlyAfterSaveAs)
 			{
 				IsReadOnly = false;
