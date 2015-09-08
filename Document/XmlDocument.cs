@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 using Aldentea.Wpf.Document.Xml;
 
-namespace Aldentea.Wpf.Document
+namespace Aldentea.Wpf.Document.Legacy
 {
 
 	#region [abstract]XmlDocumentクラス

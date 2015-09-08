@@ -7,86 +7,87 @@ using System.Xml.Linq;
 
 // 06/02/2014 by aldentea : namespaceをAldentea.Wpf.Document.Xmlに移動．
 // 01/04/2012 by aldentea : プロジェクトを移動．それに伴い，namespaceをSPP.mutus.DataからDocumentに変更．
-namespace Aldentea.Wpf.Document.Xml
+namespace Aldentea.Wpf.Document
 {
-
-	#region XTextChangedCacheクラス
-	public class XTextChangedCache : IOperationCache
+	namespace Xml
 	{
-		/// <summary>
-		/// 変更によって削除されたXTextを取得します．
-		/// </summary>
-		private string OldValue { get; set; }
-
-		/// <summary>
-		/// 変更によって設定されたXTextを取得します．
-		/// </summary>
-		private string NewValue { get; set; }
-
-		/// <summary>
-		/// 変更されたXTextの親要素を取得します．
-		/// </summary>
-		private XElement Parent { get; set; }
-
-		static XElement currentParent = null;
-		static string currentOldValue = null;
-
-		public static void SetOldValue(XText oldText)
+		#region XTextChangedCacheクラス
+		public class XTextChangedCache : Legacy.IOperationCache
 		{
-			currentParent = oldText.Parent;
-			currentOldValue = oldText.Value;
-		}
+			/// <summary>
+			/// 変更によって削除されたXTextを取得します．
+			/// </summary>
+			private string OldValue { get; set; }
 
-		#region *コンストラクタ(ElementAddedCache)
-		public XTextChangedCache(XText newText)
-		{
-			// 一致しない場合はとりあえず放置．
-			if (newText.Parent == currentParent)
+			/// <summary>
+			/// 変更によって設定されたXTextを取得します．
+			/// </summary>
+			private string NewValue { get; set; }
+
+			/// <summary>
+			/// 変更されたXTextの親要素を取得します．
+			/// </summary>
+			private XElement Parent { get; set; }
+
+			static XElement currentParent = null;
+			static string currentOldValue = null;
+
+			public static void SetOldValue(XText oldText)
 			{
-				this.OldValue = currentOldValue;
-				this.Parent = newText.Parent;
-				this.NewValue = newText.Value;
-
-				currentParent = null;
-				currentOldValue = null;
+				currentParent = oldText.Parent;
+				currentOldValue = oldText.Value;
 			}
+
+			#region *コンストラクタ(ElementAddedCache)
+			public XTextChangedCache(XText newText)
+			{
+				// 一致しない場合はとりあえず放置．
+				if (newText.Parent == currentParent)
+				{
+					this.OldValue = currentOldValue;
+					this.Parent = newText.Parent;
+					this.NewValue = newText.Value;
+
+					currentParent = null;
+					currentOldValue = null;
+				}
+			}
+			#endregion
+
+
+			#region IOperationCache実装
+
+			#region *順方向実装(Do)
+			public void Do()
+			{
+				if (NewValue != null)
+				{
+					Parent.Value = NewValue;
+				}
+				else
+				{
+					throw new InvalidOperationException();
+				}
+			}
+			#endregion
+
+			#region *逆方向実装(Reverse)
+			public void Reverse()
+			{
+				if (NewValue != null)
+				{
+					Parent.Value = OldValue;
+				}
+				else
+				{
+					throw new InvalidOperationException();
+				}
+			}
+			#endregion
+
+			#endregion
+
 		}
 		#endregion
-
-
-		#region IOperationCache実装
-
-		#region *順方向実装(Do)
-		public void Do()
-		{
-			if (NewValue != null)
-			{
-				Parent.Value = NewValue;
-			}
-			else
-			{
-				throw new InvalidOperationException();
-			}
-		}
-		#endregion
-
-		#region *逆方向実装(Reverse)
-		public void Reverse()
-		{
-			if (NewValue != null)
-			{
-				Parent.Value = OldValue;
-			}
-			else
-			{
-				throw new InvalidOperationException();
-			}
-		}
-		#endregion
-
-		#endregion
-
 	}
-	#endregion
-
 }
