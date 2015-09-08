@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AttributeChangedCache.cs" />
     <Compile Include="DocumentBase.cs" />
+    <Compile Include="LegacyDocumentWithOperationHistory.cs" />
     <Compile Include="DocumentWithOperationHistory.cs" />
     <Compile Include="ElementAddedCache.cs" />
     <Compile Include="ElementRemovedCache.cs" />

@@ -9,48 +9,49 @@ using System.Xml.Linq;
 
 // 06/02/2014 by aldentea : namespaceをAldentea.Wpf.Document.Xmlに移動．
 // 01/04/2012 by aldentea : プロジェクトを移動．それに伴い，namespaceをSPP.mutus.DataからDocumentに変更．
-namespace Aldentea.Wpf.Document.Xml
+namespace Aldentea.Wpf.Document
 {
-
-	#region ElementAddedCacheクラス
-	public class ElementAddedCache : IOperationCache
+	namespace Xml
 	{
-
-		// ※↓こいつらのgetterに外からアクセスしたい場合ってあるのかな？
-
-		/// <summary>
-		/// 追加された要素を取得します．
-		/// </summary>
-		private XElement Element { get; set; }
-
-		/// <summary>
-		/// 追加された要素の親要素を取得します．
-		/// </summary>
-		private XElement Parent { get; set; }
-
-		#region *コンストラクタ(ElementAddedCache)
-		public ElementAddedCache(XElement element)
+		#region ElementAddedCacheクラス
+		public class ElementAddedCache : Legacy.IOperationCache
 		{
-			this.Element = element;
-			this.Parent = element.Parent;
+
+			// ※↓こいつらのgetterに外からアクセスしたい場合ってあるのかな？
+
+			/// <summary>
+			/// 追加された要素を取得します．
+			/// </summary>
+			private XElement Element { get; set; }
+
+			/// <summary>
+			/// 追加された要素の親要素を取得します．
+			/// </summary>
+			private XElement Parent { get; set; }
+
+			#region *コンストラクタ(ElementAddedCache)
+			public ElementAddedCache(XElement element)
+			{
+				this.Element = element;
+				this.Parent = element.Parent;
+			}
+			#endregion
+
+			#region IOperationCache実装
+
+			public void Do()
+			{
+				Parent.Add(Element);
+			}
+
+			public void Reverse()
+			{
+				Element.Remove();
+			}
+
+			#endregion
+
 		}
 		#endregion
-
-		#region IOperationCache実装
-
-		public void Do()
-		{
-			Parent.Add(Element);
-		}
-
-		public void Reverse()
-		{
-			Element.Remove();
-		}
-
-		#endregion
-
 	}
-	#endregion
-
 }

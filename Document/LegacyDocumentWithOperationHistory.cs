@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Aldentea.Wpf.Document
+// (2.4.0)導入．
+namespace Aldentea.Wpf.Document.Legacy
 {
-	// (2.4.0)obsolete．
-	[Obsolete("Aldentea.Wpf.Document.Legacy名前空間の同名クラスを使用して下さい．")]
 	public abstract class DocumentWithOperationHistory : DocumentBase
 	{
 
@@ -25,7 +24,7 @@ namespace Aldentea.Wpf.Document
 
 		// 07/13/2014 by aldentea : virtual→abstractとなったのに対応。
 		#region *[override]初期化(Initialize)
-		protected override void InitializeDocument()
+		protected override void Initialize()
 		{
 			ClearOperationHistory();
 		}
@@ -250,9 +249,8 @@ namespace Aldentea.Wpf.Document
 	}
 
 
-	// (2.4.0)obsolete
+
 	#region IOperationCacheインターフェイス
-	[Obsolete("Aldentea.Wpf.Document.Legacy名前空間の同名インターフェイスを使用して下さい．")]
 	public interface IOperationCache
 	{
 		/// <summary>
