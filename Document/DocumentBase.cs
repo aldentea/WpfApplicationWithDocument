@@ -467,6 +467,9 @@ namespace Aldentea.Wpf.Document
 		}
 		#endregion
 
+
+		#region ユーザへの確認
+
 		// 08/22/2013 by aldentea : ConfirmからConfirmerに名前を変更．
 		// 01/18/2012 by aldentea
 		#region *Confirmerデリゲート
@@ -541,6 +544,8 @@ namespace Aldentea.Wpf.Document
 		{
 			return CollectiveConfirmer.Invoke(message);
 		}
+		#endregion
+
 		#endregion
 
 	}
