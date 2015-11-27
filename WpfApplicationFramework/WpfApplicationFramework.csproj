@@ -78,6 +78,9 @@
     <Compile Include="Application.cs" />
     <Compile Include="BasicWindow.cs" />
     <Compile Include="Commands.cs" />
+    <Compile Include="MessageDialog.xaml.cs">
+      <DependentUpon>MessageDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OutputTextDialog.xaml.cs">
       <DependentUpon>OutputTextDialog.xaml</DependentUpon>
     </Compile>
@@ -118,10 +121,25 @@
     <Resource Include="version.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="MessageDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="OutputTextDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ok.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\cancel.png" />
+    <Resource Include="Images\no.png" />
+    <Resource Include="Images\yes.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
