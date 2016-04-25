@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
 using Aldentea.Wpf.Document;
@@ -93,7 +93,7 @@ namespace Aldentea.Wpf.Application
 				Document.Saved += (c_sender, c_e) => { AddToFileHistory(c_e.FileName); };
 				BuildHistoryShortcut();
 			};
-
+			this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, Close_Executed, Always_CanExecute));
 		}
 		#endregion
 
@@ -248,6 +248,16 @@ namespace Aldentea.Wpf.Application
 		}
 		#endregion
 
+		#region コマンドハンドラ
+
+		#region Close
+		private void Close_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			this.Close();
+		}
+		#endregion
+
+		#endregion
 
 	}
 	#endregion
