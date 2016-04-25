@@ -210,6 +210,7 @@ namespace Aldentea.Wpf.Document
 		}
 		#endregion
 
+		// (3.0.1)UndoCompletedイベントを発生するようにしました．
 		// ★新たな実装では，ここではPopせずPeekを使っています．
 		// Popの処理は，AddOperationHistoryメソッドで行います．
 		#region *元に戻す(Undo)
@@ -217,7 +218,9 @@ namespace Aldentea.Wpf.Document
 		{
 			if (this.CanUndo)
 			{
-				this.operationHistory.Peek().Reverse();
+				var operationHistory = this.operationHistory.Peek();
+				operationHistory.Reverse();
+				this.UndoCompleted(this, new UndoCompletedEventArgs(operationHistory));
 			}
 		}
 		#endregion
@@ -225,6 +228,7 @@ namespace Aldentea.Wpf.Document
 		// ★新たな実装では，ここではPopせずPeekを使っています．
 		// Popの処理は，AddOperationHistoryメソッドで行います．
 
+		// (3.0.1)UndoCompletedイベントを発生するようにしました．
 		// 10/23/2014 by aldentea : _redoingフラグをfalseにしてからOperationHistory周辺の処理をするように変更．
 		// 10/20/2014 by aldentea : item.Doの後の2行を追加．(AutoSave～を切る前提なので，これを使わない場合とは相性が悪いかも．)
 		// 10/02/2014 by aldentea
@@ -236,10 +240,19 @@ namespace Aldentea.Wpf.Document
 		{
 			if (this.CanRedo)
 			{
-				this.undoHistory.Peek().Reverse();
+				var operationHistory = this.undoHistory.Peek();
+				operationHistory.Reverse();
+				this.UndoCompleted(this, new UndoCompletedEventArgs(operationHistory));
 			}
 		}
 		#endregion
+
+		// (3.0.1)
+		/// <summary>
+		/// アンドゥやリドゥが完了したときに発生します．
+		/// (この両者を区別する必要はないと考えたのですが，どうでしょう？)
+		/// </summary>
+		public event EventHandler<UndoCompletedEventArgs> UndoCompleted = delegate { };
 
 		#endregion
 
@@ -261,6 +274,22 @@ namespace Aldentea.Wpf.Document
 		/// <param name="other"></param>
 		/// <returns></returns>
 		bool CanCancelWith(IOperationCache other);
+	}
+	#endregion
+
+	// (3.0.1)
+	#region UndoCompeltedEventArgsクラス
+	public class UndoCompletedEventArgs : EventArgs
+	{
+		/// <summary>
+		/// アンドゥ(またはリドゥ)対象の操作履歴を取得します(設定はコンストラクタで行います)．
+		/// </summary>
+		public IOperationCache OperationCache { get; private set; }
+
+		public UndoCompletedEventArgs(IOperationCache operationCache)
+		{
+			this.OperationCache = operationCache;
+		}
 	}
 	#endregion
 
