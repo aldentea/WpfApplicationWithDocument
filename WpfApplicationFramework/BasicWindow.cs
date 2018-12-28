@@ -133,14 +133,14 @@ namespace Aldentea.Wpf.Application
 				ToolTip = string.Format("{0}を開きます", fileName),
 				Tag = fileName,
 			};
-			menuItem.Click += (sender, e) =>
+			menuItem.Click += async (sender, e) =>
 			{
 				var selectedMenuItem = (MenuItem)sender;
 
 				//System.Windows.Input.ApplicationCommands.Open.Execute((string)selectedMenuItem.Tag, this);
 				// 結果を取得する関係で，↑の代わりに↓のコードを採用．
 				var fName = (string)selectedMenuItem.Tag;
-				if (OpenDocument(fName, checkReadOnly: this.openAsReadOnlyFromFileHistory) == OpenDocumentResult.Failed)
+				if (await OpenDocument(fName, checkReadOnly: this.openAsReadOnlyFromFileHistory) == OpenDocumentResult.Failed)
 				{
 					RemoveFromFileHistory(fName);
 				}
