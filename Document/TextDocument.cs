@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Text;
 using System.IO;
 
@@ -60,25 +60,27 @@ namespace Aldentea.Wpf.Document
 
 		#region abstaract実装
 
+		// (4.0.0)async化。
 		// 10/22/2014 by aldentea : 返値を追加．
 		#region *ドキュメントを読み込む(LoadDocument)
-		protected override bool LoadDocument(string fileName)
+		protected async override Task<bool> LoadDocument(string fileName)
 		{
 			using (StreamReader reader = new StreamReader(fileName, Encoding.GetEncoding("UTF-8")))
 			{
-				this.Body = reader.ReadToEnd();
+				this.Body = await reader.ReadToEndAsync();
 			}
 			return true;
 		}
 		#endregion
 
+		// (4.0.0)async化。
 		// 10/22/2014 by aldentea : 返値を追加．
 		#region *ドキュメントを保存する(SaveDocument)
-		protected override bool SaveDocument(string fileName)
+		protected async override Task<bool> SaveDocument(string fileName)
 		{
 			using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.GetEncoding("UTF-8")))
 			{
-				writer.Write(_body);
+				await writer.WriteAsync(_body);
 			}
 			return true;
 		}
