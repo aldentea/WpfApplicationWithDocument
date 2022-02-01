@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>AldenteaWpfFramework</AssemblyName>
+    <RootNamespace>Aldentea.Wpf.Application</RootNamespace>
+    <Version>6.0.0</Version>
+    <Authors>aldentea</Authors>
+    <Copyright>aldentea (c) 2014</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Document\Document.csproj" />
+  </ItemGroup>
+
+</Project>

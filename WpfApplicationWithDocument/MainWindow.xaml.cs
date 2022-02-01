@@ -13,16 +13,44 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace WpfApplicationWithDocument
+using Aldentea.Wpf.Application;
+
+namespace Aldentea.Wpf.ApplicationSample
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow : Window
+	public partial class MainWindow : BasicWindow
 	{
-		public MainWindow()
+		// 08/08/2014 by aldentea : BasicWindowと重複する処理を削除．
+		public MainWindow() : base()
 		{
+
+			this.Loaded += (sender, e) =>
+			{
+				BuildHistoryShortcut();
+			};
+			
+
+			//FileHistory = MySettings.FileHistory;
+			//FileHistoryCount = MySettings.FileHistoryCount;
+
 			InitializeComponent();
+
+			// ※とりあえずコードでの指定にのみ対応．
+			FileHistoryShortcutSeparator = fileHistorySeparator;
 		}
+
+		private Properties.Settings MySettings
+		{
+			get { return App.Current.MySettings; }
+		}
+
+		// 06/18/2014 by aldentea : empty
+		private void WindowWithDocument_Closed(object sender, EventArgs e)
+		{
+			//MySettings.Save();
+		}
+
 	}
 }
