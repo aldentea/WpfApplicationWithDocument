@@ -23,6 +23,7 @@ namespace Aldentea.Wpf.Application
 		public OutputTextDialog()
 		{
 			InitializeComponent();
+			DialogConfig = new OutputTextDialogConfig();
 		}
 /*
 		public MutusIntroDocument MyDocument
@@ -296,7 +297,12 @@ namespace Aldentea.Wpf.Application
 	// 06/18/2014 by aldentea : とりあえず。
 	public class OutputTextDialogConfig
 	{
-		public string InitialDirectory { get; set; } 
+		public OutputTextDialogConfig()
+		{
+			InitialDirectory = string.Empty;
+		}
+
+		public string InitialDirectory { get; set; }
 	}
 
 

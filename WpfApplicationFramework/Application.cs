@@ -12,12 +12,14 @@ namespace Aldentea.Wpf.Application
 	// 新しいApplicationクラスを導入し，そこでuser.configやDocumentを保持するように考えてみる．
 	public abstract class Application : System.Windows.Application
 	{
+		// ☆とりあえずnull許容型にする。
+
 		#region *Documentプロパティ
 		/// <summary>
 		/// ここで設定した値は，BasicWindow(DocumentWithWindow)側のDataContextに設定されます．
 		/// また，NewDocumentとして参照できます．適宜キャストして使って下さい．
 		/// </summary>
-		public DocumentBase Document
+		public DocumentBase? Document
 		{
 			get;
 			set;
