@@ -29,8 +29,8 @@ namespace Aldentea.Wpf.Document
 			/// </summary>
 			private XElement Parent { get; set; }
 
-			static XElement currentParent = null;
-			static string currentOldValue = null;
+			static XElement? currentParent = null;
+			static string currentOldValue = String.Empty;
 
 			public static void SetOldValue(XText oldText)
 			{
@@ -41,15 +41,19 @@ namespace Aldentea.Wpf.Document
 			#region *コンストラクタ(ElementAddedCache)
 			public XTextChangedCache(XText newText)
 			{
-				// 一致しない場合はとりあえず放置．
-				if (newText.Parent == currentParent)
+				// 一致するはず．
+				if (newText.Parent != null && newText.Parent == currentParent)
 				{
 					this.OldValue = currentOldValue;
 					this.Parent = newText.Parent;
 					this.NewValue = newText.Value;
 
 					currentParent = null;
-					currentOldValue = null;
+					currentOldValue = string.Empty;
+				}
+				else
+				{
+					throw new Exception("変更が適切に記録されませんでした。");
 				}
 			}
 			#endregion

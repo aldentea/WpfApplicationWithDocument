@@ -32,8 +32,15 @@ namespace Aldentea.Wpf.Document
 			#region *コンストラクタ(ElementAddedCache)
 			public ElementAddedCache(XElement element)
 			{
-				this.Element = element;
-				this.Parent = element.Parent;
+				if (element.Parent != null)
+				{
+					this.Element = element;
+					this.Parent = element.Parent;
+				}
+				else
+				{
+					throw new Exception("elementの親が参照できません。");
+				}
 			}
 			#endregion
 

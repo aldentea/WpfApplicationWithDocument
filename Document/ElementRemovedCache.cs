@@ -33,8 +33,15 @@ namespace Aldentea.Wpf.Document
 			/// <param name="element"></param>
 			public ElementRemovedCache(XElement element)
 			{
-				this.Element = element;
-				this.Parent = element.Parent;
+				if (element != null && element.Parent != null)
+				{
+					this.Element = element;
+					this.Parent = element.Parent;
+				}
+				else
+				{
+					throw new Exception("要素の親が見つかりません。");
+				}
 			}
 			#endregion
 

@@ -26,21 +26,21 @@ namespace Aldentea.Wpf.Document
 			/// 属性の以前の値を取得します．
 			/// 新規に追加された場合は，この値はnullです．
 			/// </summary>
-			private string PreviousValue { get; set; }
+			private string? PreviousValue { get; set; }
 
 			/// <summary>
 			/// 属性の現在の値(変更後の値)を取得します．
 			/// 属性が削除された場合は，この値はnullです．
 			/// </summary>
-			private string CurrentValue { get; set; }
+			private string? CurrentValue { get; set; }
 
 			/// <summary>
 			/// 追加された要素の親要素を取得します．
 			/// </summary>
 			private XElement Parent { get; set; }
 
-			static XElement currentParent = null;
-			static string currentOldValue = null;
+			static XElement? currentParent = null;
+			static string? currentOldValue = null;
 
 			public static void SetOldValue(XAttribute attribute)
 			{
@@ -56,7 +56,11 @@ namespace Aldentea.Wpf.Document
 				this.PreviousValue = currentOldValue;
 				if (newAttribute.Parent == null)
 				{
-					// 削除された場合．
+					// 削除された場合．currentParentがnullではないはず。
+					if (currentParent == null)
+					{
+						throw new InvalidOperationException("currentParentがnullになっています。削除時に正しく記録されなかったかも？");
+					}
 					this.CurrentValue = null;
 					this.Parent = currentParent;
 				}
