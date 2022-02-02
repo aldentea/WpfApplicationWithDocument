@@ -1,0 +1,2 @@
+# WpfApplicationWithDocument
+WPF（Windows Presentation Framework）に、ドキュメントファイルを閉じたり開いたりする仕組みを追加しています。

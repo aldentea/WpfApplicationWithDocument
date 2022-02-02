@@ -9,6 +9,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+.vs
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -26,6 +27,7 @@ x86/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
+build/
 bld/
 [Bb]in/
 [Oo]bj/
@@ -73,6 +75,7 @@ StyleCopReport.xml
 *_i.c
 *_p.c
 *_h.h
+*_i.h
 *.ilk
 *.meta
 *.obj
@@ -116,6 +119,7 @@ ipch/
 *.psess
 *.vsp
 *.vspx
+.vs/
 *.sap
 
 # Visual Studio Trace Files
@@ -131,6 +135,9 @@ $tf/
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
+
+# JustCode is a .NET coding addin-in
+.JustCode
 
 # TeamCity is a build add-in
 _TeamCity*
@@ -230,7 +237,10 @@ _pkginfo.txt
 !?*.[Cc]ache/
 
 # Others
+sql/
+*.Cache
 ClientBin/
+[Ss]tyle[Cc]op.*
 ~$*
 *~
 *.dbmdl

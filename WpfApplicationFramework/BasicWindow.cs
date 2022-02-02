@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
 using Aldentea.Wpf.Document;
@@ -52,7 +52,7 @@ namespace Aldentea.Wpf.Application
 							(d, e) => { ((BasicWindow)d).FileHistoryShortcutParent = (MenuItem)((Control)e.NewValue).Parent; }
 					),
 					(value) => { return value == null || ((Control)value).Parent is MenuItem; }
-				// ↑value == nullを入れ忘れると，XamlParseExceptionでアプリケーションが立ち上がらなかった．しかもデバッグ困難．
+			// ↑value == nullを入れ忘れると，XamlParseExceptionでアプリケーションが立ち上がらなかった．しかもデバッグ困難．
 				);
 
 		#endregion
@@ -91,12 +91,12 @@ namespace Aldentea.Wpf.Application
 			{
 				if (Document != null)
 				{
-					Document.Opened += (c_sender, c_e) => { AddToFileHistory(this.Document.FileName); };
-					Document.Saved += (c_sender, c_e) => { AddToFileHistory(c_e.FileName); };
-					BuildHistoryShortcut();
+				Document.Opened += (c_sender, c_e) => { AddToFileHistory(this.Document.FileName); };
+				Document.Saved += (c_sender, c_e) => { AddToFileHistory(c_e.FileName); };
+				BuildHistoryShortcut();
 				}
 			};
-
+			this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, Close_Executed, Always_CanExecute));
 		}
 		#endregion
 
@@ -136,14 +136,14 @@ namespace Aldentea.Wpf.Application
 				ToolTip = string.Format("{0}を開きます", fileName),
 				Tag = fileName,
 			};
-			menuItem.Click += (sender, e) =>
+			menuItem.Click += async (sender, e) =>
 			{
 				var selectedMenuItem = (MenuItem)sender;
 
 				//System.Windows.Input.ApplicationCommands.Open.Execute((string)selectedMenuItem.Tag, this);
 				// 結果を取得する関係で，↑の代わりに↓のコードを採用．
 				var fName = (string)selectedMenuItem.Tag;
-				if (OpenDocument(fName, checkReadOnly: this.openAsReadOnlyFromFileHistory) == OpenDocumentResult.Failed)
+				if (await OpenDocument(fName, checkReadOnly: this.openAsReadOnlyFromFileHistory) == OpenDocumentResult.Failed)
 				{
 					RemoveFromFileHistory(fName);
 				}
@@ -171,8 +171,8 @@ namespace Aldentea.Wpf.Application
 				int n;
 				if (FileHistoryShortcutSeparator != null && FileHistoryShortcutSeparator.Parent == FileHistoryShortcutParent)
 				{
-					// FileHistoryShortcutSeparatorのインデックスに1を加えたもの．
-					n = FileHistoryShortcutParent.Items.IndexOf(FileHistoryShortcutSeparator) + 1;
+				// FileHistoryShortcutSeparatorのインデックスに1を加えたもの．
+				n = FileHistoryShortcutParent.Items.IndexOf(FileHistoryShortcutSeparator) + 1;
 				}
 				else
 				{
@@ -191,7 +191,7 @@ namespace Aldentea.Wpf.Application
 					{
 						var tag = (string)((Control)item).Tag;
 						if (tag == END_SEPARATOR || System.IO.Path.IsPathRooted(tag))
-						{
+							{
 							FileHistoryShortcutParent.Items.RemoveAt(n);
 							continue;
 						}
@@ -216,11 +216,11 @@ namespace Aldentea.Wpf.Application
 						if (!string.IsNullOrEmpty(fileName))
 						{
 							var menuItem = GenerateFileHistoryShortcutMenuItem(fileName);
-							FileHistoryShortcutParent.Items.Insert(n++, menuItem);
-						}
+						FileHistoryShortcutParent.Items.Insert(n++, menuItem);
 					}
 				}
 			}
+		}
 		}
 		#endregion
 
@@ -256,6 +256,16 @@ namespace Aldentea.Wpf.Application
 		}
 		#endregion
 
+		#region コマンドハンドラ
+
+		#region Close
+		private void Close_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			this.Close();
+		}
+		#endregion
+
+		#endregion
 
 	}
 	#endregion

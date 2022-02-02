@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 using System.ComponentModel;
 
@@ -76,18 +77,18 @@ namespace Aldentea.Wpf.Document
 			// Load中の変更については自分で制御できるのだから。ということで、そのコードを削除する。
 			if (propertyName != "NowLoading")
 			{
-				if (NowLoading)
+			if (NowLoading)
+			{
+				if (!changedPropertyQueue.Contains(propertyName))
 				{
-					if (!changedPropertyQueue.Contains(propertyName))
-					{
-						changedPropertyQueue.Enqueue(propertyName);
-					}
-				}
-				else
-				{
-					PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+					changedPropertyQueue.Enqueue(propertyName);
 				}
 			}
+			else
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
 		}
 
 		#endregion
@@ -243,8 +244,10 @@ namespace Aldentea.Wpf.Document
 		}
 
 		// 10/22/2014 by aldentea : これらのメソッドの返値をboolに変更！
-		protected abstract bool LoadDocument(string fileName);
-		protected abstract bool SaveDocument(string fileName);
+		//protected abstract bool LoadDocument(string fileName);
+		//protected abstract bool SaveDocument(string fileName);
+		protected abstract Task<bool> LoadDocument(string fileName);
+		protected abstract Task<bool> SaveDocument(string fileName);
 
 		// 07/13/2014 by aldentea
 		protected abstract void InitializeDocument();
@@ -310,6 +313,7 @@ namespace Aldentea.Wpf.Document
 		}
 		#endregion
 
+		// (4.0.0)async化。
 		// (2.3.2)LoadDocumentメソッド内で，IsReadOnlyプロパティをtrueにできるように改良
 		// (Convertedプロパティと一緒にtrueにするケースを想定)．
 		// (2.3.1)読み取り専用ファイルを開くときには自動的にIsReadOnlyプロパティをtrueにする．
@@ -322,7 +326,7 @@ namespace Aldentea.Wpf.Document
 		/// ファイルが正常に開いた場合は，Openedイベントが発生します．
 		/// </summary>
 		/// <param name="fileName">開くファイル名をフルパスでどうぞ．</param>
-		public void Open(string fileName, bool isReadOnly = false)
+		public async Task Open(string fileName, bool isReadOnly = false)
 		{
 			//Initialize();	// ←これいる？
 			System.IO.FileInfo info = new System.IO.FileInfo(fileName);
@@ -331,7 +335,7 @@ namespace Aldentea.Wpf.Document
 			this.NowLoading = true;
 			try
 			{
-				if (!LoadDocument(fileName))
+				if (!await LoadDocument(fileName))
 				{
 					return;
 				}
@@ -381,28 +385,29 @@ namespace Aldentea.Wpf.Document
 
 		// SaveとSaveAsで処理が重複しているのが気に入らないけど...
 
+		// (4.0.0)async化。
 		// 10/22/2014 by aldentea : SaveDocumentの返値の処理を追加．(必要かどうかはわかりませんｗ)
 		// 08/08/2014 by aldentea : Savedイベントの引数型の変更に対応．
 		// 06/17/2014 by aldentea : Convertedであれば，RequireSaveAsを返すように変更．
 		// 01/08/2013 by aldentea : IsDirtyの確認時に，Convertedも確認するように修正．
 		// 08/22/2013 by aldentea : Convertedプロパティのクリアを追加．
 		#region *保存(Save)
-		public SaveResult Save()
+		public async Task<SaveResult> Save()
 		{
 			// readonlyだと常にfalseを返す．
 			if (this.IsModified)
 			{
 				if (this.IsConverted || (string.IsNullOrEmpty(this.FileName)))
 				{
-					//if (this.IsDirty || this.Converted)
-					//{
-					//  if (this.FileName == string.Empty)
-					//  {
+			//if (this.IsDirty || this.Converted)
+			//{
+			//  if (this.FileName == string.Empty)
+			//  {
 					return SaveResult.RequireSaveAs;
 				}
 				else
 				{
-					if (SaveDocument(this.FileName))
+					if (await SaveDocument(this.FileName))
 					{
 						ClearDirty();
 						IsConverted = false;
@@ -423,13 +428,14 @@ namespace Aldentea.Wpf.Document
 		}
 		#endregion
 
+		// (4.0.0)async化。
 		// 08/08/2014 by aldentea : Savedイベントの引数型の変更に対応．
 		// 08/08/2014 by aldentea : IsReadOnlyをクリアする処理を追加．
 		// 08/22/2013 by aldentea : Convertedプロパティのクリアを追加．
 		// 06/14/2011 by aldentea : IsModifiedのチェックを削除．(更新されていなくても名前を変えて保存したい場合があるよね！)
 		// 04/26/2011 by aldentea : FileNameプロパティを保存処理の前に設定するように変更．
 		#region *名前をつけて保存(SaveAs)
-		public SaveResult SaveAs(string fileName)
+		public async Task<SaveResult> SaveAs(string fileName)
 		{
 			// ☆IsReadOnlyが立っていると，Saveはできないが，SaveAsから同名で保存することは(現在の実装では)可能．
 			// それをどう考えるか？
@@ -440,7 +446,7 @@ namespace Aldentea.Wpf.Document
 			this.FileName = fileName;
 			try
 			{
-				SaveDocument(fileName);
+				await SaveDocument(fileName);
 			}
 			catch (Exception)
 			{
@@ -459,6 +465,7 @@ namespace Aldentea.Wpf.Document
 		}
 		#endregion
 
+		// (4.0.0)async化。
 		// 08/08/2014 by aldentea : Savedイベントを発生させる選択肢を用意．
 		#region *コピーを保存(SaveCopyAs)
 		/// <summary>
@@ -467,10 +474,10 @@ namespace Aldentea.Wpf.Document
 		/// </summary>
 		/// <param name="fileName"></param>
 		/// <returns></returns>
-		public SaveResult SaveCopyAs(string fileName)
+		public async Task<SaveResult> SaveCopyAs(string fileName)
 		{
 			//string oldFileName = this.FileName;
-			SaveDocument(fileName);
+			await SaveDocument(fileName);
 
 			if (RaiseSavedEventAfterSaveCopyAs)
 			{

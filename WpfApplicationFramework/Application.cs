@@ -21,6 +21,10 @@ namespace Aldentea.Wpf.Application
 		{
 			get;
 			set;
+			//get
+			//{
+			//	return  as DocumentBase;
+			//}
 		}
 		#endregion
 
@@ -50,8 +54,8 @@ namespace Aldentea.Wpf.Application
 
 		public void AddToFileHistory(string fileName)
 		{     // ※そもそもこんな↓心配する必要アルの？
-					// nullになりうるのは開発時だけじゃない？
-					// ※考えられるのは，NullReferenceException飛ばして再試行とか．
+			// nullになりうるのは開発時だけじゃない？
+			// ※考えられるのは，NullReferenceException飛ばして再試行とか．
 			if (FileHistory == null)
 			{
 				// これどうする？

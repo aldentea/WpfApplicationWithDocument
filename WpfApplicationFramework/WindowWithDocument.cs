@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Text;
 
 using Aldentea.Wpf.Document;
@@ -15,6 +15,7 @@ namespace Aldentea.Wpf.Application
 	public class WindowWithDocument : Window
 	{
 
+		// (4.0.0)async化。
 		#region *コンストラクタ(WindowWithDocument)
 		/// <summary>
 		/// NOSSコマンドバインディングを設定し，Closing時に保存を確認するイベントを設定しています．
@@ -25,9 +26,9 @@ namespace Aldentea.Wpf.Application
 			// DataContextの設定．
 			this.DataContext = Document;
 
-			this.Closing += (sender, e) =>
+			this.Closing += async (sender, e) =>
 			{
-				e.Cancel = !CloseDocument();
+				e.Cancel = !await CloseDocument();
 			};
 
 			// コマンドバインディングの設定．
@@ -103,7 +104,7 @@ namespace Aldentea.Wpf.Application
 			}
 		}
 
-		public static readonly DependencyProperty OpenFileDialogFilterProperty
+		public static readonly DependencyProperty OpenFileDialogFilterProperty 
 				= DependencyProperty.Register(
 						"OpenFileDialogFilter",
 						typeof(string),
@@ -119,6 +120,7 @@ namespace Aldentea.Wpf.Application
 
 		// ※とりあえずこのあたりのレイヤーで例外処理を行っておく．
 
+		// (4.0.0)async化。
 		// 03/19/2012 by aldentea : IOExceptionのハンドルを追加．
 		#region *ドキュメントを保存(SaveDocument)
 		/// <summary>
@@ -126,15 +128,15 @@ namespace Aldentea.Wpf.Application
 		/// 結果的にModifiedフラグが消えたならばtrueを，Modifiedフラグが残っているならばfalseを返します．
 		/// </summary>
 		/// <returns></returns>
-		private bool SaveDocument()
+		private async Task<bool> SaveDocument()
 		{
 			try
 			{
-				switch (Document.Save())
+				switch (await Document.Save())
 				{
 					case SaveResult.RequireSaveAs:
 						// try SaveAs
-						return SaveAsDocument();
+						return await SaveAsDocument();
 					case SaveResult.Succeed:
 						//AddToFileHistory(document.FileName);
 						return true;
@@ -154,6 +156,7 @@ namespace Aldentea.Wpf.Application
 		}
 		#endregion
 
+		// (4.0.0)async化。
 		// 03/19/2012 by aldentea : IOExceptionのハンドルを追加．※SaveDocumentメソッドからのコピペ．
 		#region *ドキュメントに名前をつけて保存(SaveAsDocument)
 		/// <summary>
@@ -161,7 +164,7 @@ namespace Aldentea.Wpf.Application
 		/// 結果的にModifiedフラグが消えたならばtrueを，Modifiedフラグが残っているならばfalseを返します．
 		/// </summary>
 		/// <returns></returns>
-		private bool SaveAsDocument()
+		private async Task<bool> SaveAsDocument()
 		{
 			// try SaveAs
 			Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog { Filter = this.SaveFileDialogFilter };
@@ -169,7 +172,7 @@ namespace Aldentea.Wpf.Application
 			{
 				try
 				{
-					var result = Document.SaveAs(dialog.FileName);
+					var result = await Document.SaveAs(dialog.FileName);
 					if (result == SaveResult.Succeed)
 					{
 						//AddToFileHistory(document.FileName);
@@ -192,15 +195,16 @@ namespace Aldentea.Wpf.Application
 		}
 		#endregion
 
+		// (4.0.0)async化。
 		#region *ドキュメントをクローズ(CloseDocument)
 		/// <summary>
 		/// ドキュメントを閉じます．必要に応じて保存確認のメッセージボックスが表示されます．
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		protected bool CloseDocument()
+		protected async Task<bool> CloseDocument()
 		{
-			if (ConfirmToClose())
+			if (await ConfirmToClose())
 			{
 				Document.Close();
 				return true;
@@ -212,9 +216,10 @@ namespace Aldentea.Wpf.Application
 		}
 		#endregion
 
+		// (4.0.0)async化。
 		// 07/10/2012 by aldentea : CloseDocumentメソッドから分離．
 		#region *閉じる前に確認する(ConfirmToClose)
-		protected bool ConfirmToClose()
+		protected async Task<bool> ConfirmToClose()
 		{
 			bool ready = !Document.IsModified;
 
@@ -223,7 +228,7 @@ namespace Aldentea.Wpf.Application
 				switch (MessageBox.Show("保存しますか？", "保存確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Exclamation))
 				{
 					case MessageBoxResult.Yes:
-						return SaveDocument();
+						return await SaveDocument();
 					case MessageBoxResult.No:
 						return true;
 					default:
@@ -238,6 +243,7 @@ namespace Aldentea.Wpf.Application
 		#endregion
 
 
+		// (4.0.0)async化。
 		// 01/14/2014 by aldentea : ファイルをReadOnlyで開けるように変更．
 		// 07/10/2012 by aldentea : 開くファイル名の選択時にキャンセルされた場合は，現在のドキュメントを閉じないように変更．
 		// 03/19/2012 by aldentea : 返値をboolからOpenDocumentResult列挙体に変更．
@@ -268,10 +274,10 @@ namespace Aldentea.Wpf.Application
 		/// <param name="checkReadOnly">trueの場合，ファイルダイアログを表示するときに，デフォルトで「読み取り専用」を選択します．
 		/// ファイル名を指定したときは，「読み取り専用」として開きます．</param>
 		/// <returns></returns>
-		protected OpenDocumentResult OpenDocument(string? fileName = null, bool showReadOnly = false, bool checkReadOnly = false)
+		protected async Task<OpenDocumentResult> OpenDocument(string? fileName = null, bool showReadOnly = false, bool checkReadOnly = false)
 		{
 			// 1.現在のドキュメントを閉じていいか確認． 
-			if (!ConfirmToClose())
+			if (!await ConfirmToClose())
 			{
 				return OpenDocumentResult.Canceled;
 			}
@@ -282,11 +288,11 @@ namespace Aldentea.Wpf.Application
 			if (string.IsNullOrEmpty(fileName))
 			{
 				var dialog = new Microsoft.Win32.OpenFileDialog
-				{
-					Filter = this.OpenFileDialogFilter,
-					ShowReadOnly = showReadOnly,
-					ReadOnlyChecked = checkReadOnly
-				};
+													{
+														Filter = this.OpenFileDialogFilter,
+														ShowReadOnly = showReadOnly,
+														ReadOnlyChecked = checkReadOnly
+													};
 				// よくわからないが，ShowReadOnlyをtrueにしてもダイアログの外観に変化がない．
 				if (dialog.ShowDialog() == true)
 				{
@@ -311,7 +317,7 @@ namespace Aldentea.Wpf.Application
 			{
 				try
 				{
-					Document.Open(fileName, is_read_only);
+					await Document.Open(fileName, is_read_only);
 					return OpenDocumentResult.Opened;
 				}
 				catch (System.IO.IOException ex)
@@ -382,45 +388,49 @@ namespace Aldentea.Wpf.Application
 		// というか，外から直接OpenDocumentメソッドなどを呼び出すのではなく，
 		// コマンドハンドラを通してのみ処理を実行するようにしますか？
 
-		protected void New_Executed(object sender, ExecutedRoutedEventArgs e)
+		// (4.0.0)async化。
+		protected async void New_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			CloseDocument();
+			await CloseDocument();
 		}
 
+		// (4.0.0)async化。
 		// 01/14/2014 by aldentea : パラメータとして，stringの他にOpenDocumentParameterをとれるように変更．
 		// 03/19/2012 by aldentea : 例外処理をOpenDocumentメソッドに移動．
 		// 06/21/2011 by aldentea : FileNotFoundExceptionの処理を追加．
-		protected void Open_Executed(object sender, ExecutedRoutedEventArgs e)
+		protected async void Open_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (e.Parameter is OpenDocumentParameter)
 			{
 				var parameter = (OpenDocumentParameter)e.Parameter;
-				OpenDocument(
+				await OpenDocument(
 					fileName: parameter.FileName,
 					showReadOnly: parameter.EnableReadOnly,
 					checkReadOnly: parameter.IsReadOnly);
 			}
 			else
 			{
-				OpenDocument(e.Parameter as string);
+				await OpenDocument(e.Parameter as string);
 			}
 		}
 
+		// (4.0.0)async化。
 		// 06/22/2014 by aldentea : ConfirmToSaveを追加。
-		protected void Save_Executed(object sender, ExecutedRoutedEventArgs e)
+		protected async void Save_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (ConfirmToSave())
 			{
-				SaveDocument();
+				await SaveDocument();
 			}
 		}
 
+		// (4.0.0)async化。
 		// 06/22/2014 by aldentea : ConfirmToSaveを追加。
-		protected void SaveAs_Executed(object sender, ExecutedRoutedEventArgs e)
+		protected async void SaveAs_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (ConfirmToSave())
 			{
-				SaveAsDocument();
+				await SaveAsDocument();
 			}
 		}
 
